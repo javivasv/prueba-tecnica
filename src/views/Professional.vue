@@ -4,14 +4,14 @@
       <v-col cols="6">
         <v-row>
           <v-card v-if="gotProfessional">
-            <v-row>
+            <v-row v-if="professional.person.picture">
               <v-avatar size="150" tile>
                 <v-img :src="professional.person.picture"> </v-img>
               </v-avatar>
             </v-row>
             <h3>Nombre</h3>
             <v-row>{{ professional.person.name }}</v-row>
-            <h3>Intereses</h3>
+            <h3 v-if="professional.interests.length > 0">Intereses</h3>
             <v-row
               v-for="interest of professional.interests"
               :key="interest.code"
@@ -40,6 +40,7 @@ export default class Professional extends Vue {
       const res = await axios.get(`https://torre.bio/api/bios/${username}`);
       this.professional = res.data;
       this.gotProfessional = true;
+      console.log(this.professional);
     } catch (error) {
       console.log(error);
     }
