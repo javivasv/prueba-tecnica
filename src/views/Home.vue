@@ -3,28 +3,30 @@
     <v-col>
       <v-row id="content-row" justify="center">
         <v-col cols="6">
-          <v-row>
-            <v-btn @click="searchJobs = false">Profesionales</v-btn>
-            <v-btn @click="searchJobs = true">Ofertas de trabajo</v-btn>
+          <v-row class="action-row">
+            <v-btn @click="changeSearch('professionals')">Profesionales</v-btn>
+            <v-btn @click="changeSearch('offers')">Ofertas de trabajo</v-btn>
           </v-row>
           <template v-if="!searchJobs">
             <v-form v-on:submit.prevent="searchProfessionals('search')">
               <v-row justify="center">
                 <v-text-field
                   label="Buscar profesionales"
-                  v-model="professionals"
+                  v-model="search"
                 ></v-text-field>
               </v-row>
               <v-row justify="center">
                 <v-btn type="submit">Buscar</v-btn>
               </v-row>
             </v-form>
-            <template>
-              <v-card v-for="result of this.results" :key="result.username">
-                <v-row>{{ result.username }}</v-row>
-              </v-card>
-            </template>
-            <v-row>
+            <v-card
+              v-for="result of this.results"
+              :key="result.username"
+              @click="inspectProfessional(result)"
+            >
+              <v-row>{{ result.name }}</v-row>
+            </v-card>
+            <v-row class="action-row">
               <v-btn
                 v-if="this.previous"
                 @click="searchProfessionals('previous')"
@@ -40,19 +42,17 @@
               <v-row justify="center">
                 <v-text-field
                   label="Buscar ofertas de trabajo"
-                  v-model="offers"
+                  v-model="search"
                 ></v-text-field>
               </v-row>
               <v-row justify="center">
                 <v-btn type="submit">Buscar</v-btn>
               </v-row>
             </v-form>
-            <template>
-              <v-card v-for="result of this.results" :key="result.id">
-                <v-row>{{}}</v-row>
-              </v-card>
-            </template>
-            <v-row>
+            <v-card v-for="result of this.results" :key="result.id">
+              <v-row>{{}}</v-row>
+            </v-card>
+            <v-row class="action-row">
               <v-btn v-if="this.previous" @click="searchOffers('previous')"
                 >Anterior</v-btn
               >
@@ -74,8 +74,7 @@ import axios from "axios";
 
 @Component({})
 export default class Home extends Vue {
-  professionals = "";
-  offers = "";
+  search = "";
   results = [] as any;
   previous = null as any;
   next = null as any;
@@ -83,7 +82,7 @@ export default class Home extends Vue {
 
   async searchProfessionals(action: string) {
     const body = {
-      name: { term: this.professionals },
+      name: { term: this.search },
     };
 
     try {
@@ -108,16 +107,17 @@ export default class Home extends Vue {
       this.results = (res.data as any).results;
       this.previous = (res.data as any).pagination.previous;
       this.next = (res.data as any).pagination.next;
+      console.log(this.results);
     } catch (error) {
       console.log(error);
     }
   }
 
   async searchOffers(action: string) {
-    console.log(this.offers);
+    console.log(this.search);
 
     const body = {
-      objective: { term: this.offers },
+      objective: { term: this.search },
     };
 
     try {
@@ -149,17 +149,27 @@ export default class Home extends Vue {
       console.log(error);
     }
   }
+
+  changeSearch(search: string) {
+    this.search = "";
+    this.previous = null;
+    this.next = null;
+    this.results = [];
+
+    if (search === "professionals") {
+      this.searchJobs = false;
+    } else if (search === "offers") {
+      this.searchJobs = true;
+    }
+  }
+
+  inspectProfessional(result: any) {
+    this.$router.push({
+      name: "professional",
+      params: { username: result.username },
+    });
+  }
 }
-
-/*
-export default Vue.extend({
-  name: "Home",
-
-  components: {
-    HelloWorld,
-  },
-});
-*/
 </script>
 
 <style lang="scss" scoped>
@@ -182,7 +192,7 @@ export default Vue.extend({
   height: 100%;
 }
 
-.v-form {
-  height: 100%;
+.action-row {
+  justify-content: space-evenly;
 }
 </style>
