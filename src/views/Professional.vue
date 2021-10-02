@@ -40,7 +40,6 @@ export default class Professional extends Vue {
       const res = await axios.get(`https://torre.bio/api/bios/${username}`);
       this.professional = res.data;
       this.gotProfessional = true;
-      console.log(this.professional);
     } catch (error) {
       console.log(error);
     }

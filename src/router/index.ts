@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 import Home from "../views/Home.vue";
 import Professional from "../views/Professional.vue";
+import Offer from "../views/Offer.vue";
 
 Vue.use(VueRouter);
 
@@ -15,6 +16,11 @@ const routes: Array<RouteConfig> = [
     path: "/:username",
     name: "professional",
     component: Professional,
+  },
+  {
+    path: "/:id",
+    name: "offer",
+    component: Offer,
   },
   {
     path: "/about",

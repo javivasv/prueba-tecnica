@@ -49,8 +49,12 @@
                 <v-btn type="submit">Buscar</v-btn>
               </v-row>
             </v-form>
-            <v-card v-for="result of this.results" :key="result.id">
-              <v-row>{{}}</v-row>
+            <v-card
+              v-for="result of this.results"
+              :key="result.id"
+              @click="inspectOffer(result)"
+            >
+              <v-row>{{ result.objective }}</v-row>
             </v-card>
             <v-row class="action-row">
               <v-btn v-if="this.previous" @click="searchOffers('previous')"
@@ -70,7 +74,6 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import axios from "axios";
-//import HelloWorld from "../components/HelloWorld.vue";
 
 @Component({})
 export default class Home extends Vue {
@@ -107,15 +110,12 @@ export default class Home extends Vue {
       this.results = (res.data as any).results;
       this.previous = (res.data as any).pagination.previous;
       this.next = (res.data as any).pagination.next;
-      console.log(this.results);
     } catch (error) {
       console.log(error);
     }
   }
 
   async searchOffers(action: string) {
-    console.log(this.search);
-
     const body = {
       objective: { term: this.search },
     };
@@ -127,21 +127,18 @@ export default class Home extends Vue {
           `https://search.torre.co/opportunities/_search/?[offset=0&size=10&aggregate=false]`,
           body
         );
-      }
-      /*else if (action === "next") {
+      } else if (action === "next") {
         res = await axios.post(
-          `https://search.torre.co/people/_search/?[offset=0&size=10&after=${this.next}&aggregate=false]`,
+          `https://search.torre.co/opportunities/_search/?[offset=0&size=10&after=${this.next}&aggregate=false]`,
           body
         );
       } else if (action === "previous") {
         res = await axios.post(
-          `https://search.torre.co/people/_search/?[offset=0&size=10&before=${this.previous}&aggregate=false]`,
+          `https://search.torre.co/opportunities/_search/?[offset=0&size=10&after=${this.previous}&aggregate=false]`,
           body
         );
       }
-      */
 
-      console.log(res);
       this.results = (res.data as any).results;
       this.previous = (res.data as any).pagination.previous;
       this.next = (res.data as any).pagination.next;
@@ -169,6 +166,13 @@ export default class Home extends Vue {
       params: { username: result.username },
     });
   }
+
+  inspectOffer(result: any) {
+    this.$router.push({
+      name: "offer",
+      params: { id: result.id },
+    });
+  }
 }
 </script>
 
@@ -194,5 +198,11 @@ export default class Home extends Vue {
 
 .action-row {
   justify-content: space-evenly;
+  margin: 15px;
+}
+
+.v-card {
+  padding: 10px;
+  margin: 10px;
 }
 </style>
